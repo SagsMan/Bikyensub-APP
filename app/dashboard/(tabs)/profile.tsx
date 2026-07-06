@@ -238,11 +238,20 @@ const Profile = () => {
       if (!userData) return;
       const parsedUser = JSON.parse(userData);
 
+      const emailToUse = user?.email || parsedUser.email;
+      if (!emailToUse) {
+        setAlertTitle("Session Expired");
+        setAlertMessage("Please log out and log in again to update your PIN.");
+        setAlertVisible(true);
+        setIsLoading(false);
+        return;
+      }
+
       const response = await fetch(endPoints.login, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          email: parsedUser.email,
+          email: emailToUse,
           password: verificationPassword,
         }),
       });
