@@ -158,25 +158,40 @@ const DataPage = () => {
       });
 
       const text = await response.text();
+      let extraTypes: any[] = [];
       try {
         const data = JSON.parse(text);
         if (data.success && data.types) {
-          // Prepend "Data Bundle" as it's the standard type
-          const formattedTypes = [
-            { name: "DATA BUNDLE" },
-            ...data.types.map((t: any) => ({
-              name: t.name || t,
+          extraTypes = data.types
+            .filter((t: any) => t.name && String(t.name).trim() !== "")
+            .map((t: any) => ({
+              name: t.name,
               id: t.id,
-              plan_id: t.plan_id || t.id, // Support different ID aliases
-            })),
-          ];
-          setDataTypes(formattedTypes);
+              plan_id: t.plan_id || t.id,
+            }));
         }
       } catch (e) {
         console.error("Failed to parse JSON response:", text);
       }
+
+      const allTypes = [{ name: "DATA BUNDLE" }, ...extraTypes];
+      setDataTypes(allTypes);
+
+      // Auto-select DATA BUNDLE when there are no other types so users
+      // don't have to manually pick and can go straight to the plan selector
+      if (allTypes.length === 1) {
+        const defaultType = { name: "DATA BUNDLE" };
+        setSelectedType(defaultType);
+        fetchDataPlans(networkId, defaultType);
+      }
     } catch (error) {
       console.error("Fetch data types error:", error);
+      // On any network error, still default to DATA BUNDLE
+      const fallback = [{ name: "DATA BUNDLE" }];
+      setDataTypes(fallback);
+      const defaultType = { name: "DATA BUNDLE" };
+      setSelectedType(defaultType);
+      fetchDataPlans(networkId, defaultType);
     } finally {
       setFetchingTypes(false);
     }
