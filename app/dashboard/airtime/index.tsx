@@ -318,7 +318,7 @@ const Airtime = () => {
         return;
       }
 
-      const response = await fetch(endPoints.buyAirtime, {
+      const response = await fetch(endPoints.getBalance, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
