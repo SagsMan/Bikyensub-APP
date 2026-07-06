@@ -653,9 +653,9 @@ const DataPage = () => {
                       borderColor: colors.inputBorder,
                     },
                   ]}
-                  onPress={() => setPlanModal(true)}
+                  onPress={() => selectedType && setPlanModal(true)}
                   activeOpacity={0.8}
-                  disabled={fetchingPlans}
+                  disabled={fetchingPlans || !selectedType}
                 >
                   <View
                     style={{
@@ -676,7 +676,9 @@ const DataPage = () => {
                     >
                       {fetchingPlans
                         ? "Fetching plans..."
-                        : (selectedPlan?.name ?? "Choose a bundle")}
+                        : !selectedType
+                          ? "Select a type first"
+                          : (selectedPlan?.name ?? "Choose a bundle")}
                     </Text>
                   </View>
                   {fetchingPlans ? (
